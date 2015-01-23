@@ -40,3 +40,41 @@ Vectors
  
     That way it can be coerced up the type heirarchy Logical -> Integer -> Double -> Character, rather than
     forcing the other data to be coerced up.
+
+
+Attributes
+----------
+
+ 1. An early draft used this code to illustrate structure():
+    ```r
+    structure(1:5, comment = "my attribute")
+    #> [1] 1 2 3 4 5
+    ```
+    But when you print that object you don’t see the comment attribute. Why? Is the attribute missing, or is there        something else special about it?
+    
+    `comment` (as well as `class`, `dim`, `dimnames`, `names`, `row.names` and `tsp`) are reserved and handled
+    differently to other attributes.
+    
+ 2. What happens to a factor when you modify its levels?
+    ```r
+    f1 <- factor(letters)
+    levels(f1) <- rev(levels(f1))  
+    ```
+    
+    The underlying integer values in any existing data isn't modified, but the association to names is.
+    
+ 3. What does this code do? How do f2 and f3 differ from f1?
+    ```r
+    f2 <- rev(factor(letters))
+    
+    f3 <- factor(letters, levels = rev(letters))
+    ```
+    
+    The integer values in `f2` are reversed from `f1`, as is the mapping from integers to names. 
+    `f3` has the same integer data as `f2`---`c(26, 25, ..., 1)`---but the same mapping as `f1`.
+ 
+
+Matrices and arrays
+-------------------
+
+ 1. 
