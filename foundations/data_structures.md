@@ -77,4 +77,17 @@ Attributes
 Matrices and arrays
 -------------------
 
- 1. 
+ 1. What does dim() return when applied to a vector?
+
+    `NULL`
+
+ 2. If `is.matrix(x)` is `TRUE`, what will `is.array(x)` return?
+
+    `TRUE`
+
+    3. How would you describe the following three objects? What makes them different to 1:5?
+    ```r
+    x1 <- array(1:5, c(1, 1, 5))
+    x2 <- array(1:5, c(1, 5, 1))
+    x3 <- array(1:5, c(5, 1, 1))
+    ```r
