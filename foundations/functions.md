@@ -34,7 +34,7 @@ Function Components
 
         ```r
         lengths = 1:length(funs)
-        for (i in 1:length(funs)) { 
+        for (i in 1:length(funs)) {  # SUBMIT A STACKOVERFLOW QUESTION - WHY DOESN'T SAPPLY WORK HERE?
             lengths[i] = fun_obj_args_len(funs[i])
         }
         funs[which.max(lengths)]  # scan function, 22 arguments
