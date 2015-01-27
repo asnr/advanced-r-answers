@@ -1,24 +1,22 @@
 Function Components
 -------------------
 
- 1.  What function allows you to tell if an object is a function?
-     What function allows you to tell if a function is a primitive function?
+1.  What function allows you to tell if an object is a function?
+    What function allows you to tell if a function is a primitive function?
 
-     `is.function()` and `is.primitive()`
+    `is.function()` and `is.primitive()`
 
-    num_args = function(f) length(formals(args(f)))
-
- 2. This code makes a list of all functions in the base package.
+2.  This code makes a list of all functions in the base package.
     ```r
     objs <- mget(ls("package:base"), inherits = TRUE)
     funs <- Filter(is.function, objs)
     ```
 
-    Use it to answer the following questions:
+   Use it to answer the following questions:
 
-     a. Which base function has the most arguments?
+   1.  Which base function has the most arguments?
 
-        The `funs` array holds objects which in turn store a function as an attribute. To unwrap this mess we need
+       The `funs` array holds objects which in turn store a function as an attribute. To unwrap this mess we need
 
         ```r
         extract_fun = function(fun_obj) fun_obj[[ names(fun_obj)[1] ]]
@@ -40,7 +38,7 @@ Function Components
         funs[which.max(lengths)]  # scan function, 22 arguments
         ```
 
-     b. How many base functions have no arguments?
+     2. How many base functions have no arguments?
         What’s special about those functions?
 
         ```r
@@ -50,17 +48,17 @@ Function Components
 
         70 functions have no arguments. No idea what's special about them. There are infix operators like `[` and `@` as well as OS calls like `Sys.time()` and random function like `contributors()` which lists contributors to the R project.
 
-     c. How could you adapt the code to find all primitive functions?
+    3. How could you adapt the code to find all primitive functions?
 
         ```r
         objs <- mget(ls("package:base"), inherits = TRUE)
         funs <- Filter(is.primitive, objs)
         ```
 
- 3. What are the three important components of a function?
+3.  What are the three important components of a function?
 
     `formals`, `body`, `environment`
 
- 4. When does printing a function not show what environment it was created in?
+4.  When does printing a function not show what environment it was created in?
 
     When the environment is the global environment.
