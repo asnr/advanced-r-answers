@@ -38,22 +38,22 @@ Function Components
         funs[which.max(lengths)]  # scan function, 22 arguments
         ```
 
-     2. How many base functions have no arguments?
-        What’s special about those functions?
+   2. How many base functions have no arguments?
+      What’s special about those functions?
 
-        ```r
-        no_args = lengths == 0
-        funs[no_args]
-        ```
+      ```r
+      no_args = lengths == 0
+      funs[no_args]
+      ```
 
-        70 functions have no arguments. No idea what's special about them. There are infix operators like `[` and `@` as well as OS calls like `Sys.time()` and random function like `contributors()` which lists contributors to the R project.
+      70 functions have no arguments. No idea what's special about them. There are infix operators like `[` and `@` as well as OS calls like `Sys.time()` and random function like `contributors()` which lists contributors to the R project.
 
     3. How could you adapt the code to find all primitive functions?
 
-        ```r
-        objs <- mget(ls("package:base"), inherits = TRUE)
-        funs <- Filter(is.primitive, objs)
-        ```
+       ```r
+       objs <- mget(ls("package:base"), inherits = TRUE)
+       funs <- Filter(is.primitive, objs)
+       ```
 
 3.  What are the three important components of a function?
 
