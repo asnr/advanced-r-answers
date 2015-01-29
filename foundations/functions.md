@@ -62,3 +62,41 @@ Function Components
 4.  When does printing a function not show what environment it was created in?
 
     When the environment is the global environment.
+
+
+Every Operation Is A Function Call
+----------------------------------
+
+1.  Clarify the following list of odd function calls:
+    ```r
+    x <- sample(replace = TRUE, 20, x = c(1:10, NA))
+    y <- runif(min = 0, max = 1, 20)
+    cor(m = "k", y = y, u = "p", x = x)
+    ```
+
+    They are equivalent to
+    ```r
+    x <- sample(c(1:10, NA), 20, replace=TRUE)  # sample {1, 2, ..., 10, NA} 20 times w/ replacement
+    y <- runif(20, min=0, max=1)  # randomly sample X~uniform(0, 1)
+    cor(x, y, method="kendall", use="pairwise.complete.obs")
+    ```
+
+2.  What does this function return? Why? Which principle does it illustrate?
+    ```r
+    f1 <- function(x = {y <- 1; 2}, y = 0) {
+      x + y
+    }
+    f1()
+    ```
+
+    `3`. `x` is evaluated before `y`, which causes the original promise of `y` to be overwritten by `1`. Compare with
+    ```r
+    f2 <- function(x = { y <- 1; 2}, y = x) { y + x }
+    f2()  # 4
+    f3 <- function(x = {y <- 1; 2}, y = 0)  { y + x }
+    f3()  # 2
+    ```
+
+
+Special Calls
+-------------
