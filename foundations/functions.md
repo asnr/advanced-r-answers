@@ -91,12 +91,89 @@ Every Operation Is A Function Call
 
     `3`. `x` is evaluated before `y`, which causes the original promise of `y` to be overwritten by `1`. Compare with
     ```r
-    f2 <- function(x = { y <- 1; 2}, y = x) { y + x }
-    f2()  # 4
-    f3 <- function(x = {y <- 1; 2}, y = 0)  { y + x }
-    f3()  # 2
+    g2 <- function(x = {y <- 1; 2}, y = x) { y + x }
+    g2()  # 4
+    g3 <- function(x = {y <- 1; 2}, y = 0)  { y + x }
+    g3()  # 2
+    ```
+
+3.  What does this function return? Why? Which principle does it illustrate?
+    ```r
+    f2 <- function(x = z) {
+      z <- 100
+      x
+    }
+    f2()
+    ```
+
+    `100`. Illustrates lazy evaluation.
+
+Special Calls
+-------------
+
+1.  Create a list of all the replacement functions found in the base package.
+    Which ones are primitive functions?
+
+    ```r
+    library(magrittr)
+    library(stringr)
+    is_replacement = . %>% str_detect(., '<-$')
+    objs <- mget(ls("package:base"), inherits = TRUE)
+    repl_funs = Filter(is_replacement, names(objs))
+    repl_funs
+     [1] "[[<-"             "[<-"              "@<-"              "<-"
+     [5] "<<-"              "$<-"              "attr<-"           "attributes<-"
+     [9] "body<-"           "class<-"          "colnames<-"       "comment<-"
+    [13] "diag<-"           "dim<-"            "dimnames<-"       "Encoding<-"
+    [17] "environment<-"    "formals<-"        "is.na<-"          "length<-"
+    [21] "levels<-"         "mode<-"           "mostattributes<-" "names<-"
+    [25] "oldClass<-"       "parent.env<-"     "regmatches<-"     "row.names<-"
+    [29] "rownames<-"       "split<-"          "storage.mode<-"   "substr<-"
+    [33] "substring<-"      "units<-"
+    length(repl_funs)
+    [1] 34
+
+    # Primitive replacement functions:
+    prim_repl_funs = Filter(is.primitive, objs[repl_funs])
+    names(prim_repl_funs)
+     [1] "[[<-"           "[<-"            "@<-"            "<-"
+     [5] "<<-"            "$<-"            "attr<-"         "attributes<-"
+     [9] "class<-"        "dim<-"          "dimnames<-"     "environment<-"
+    [13] "length<-"       "levels<-"       "names<-"        "oldClass<-"
+    [17] "storage.mode<-"
+    ```
+
+2.  What are valid names for user-created infix functions?
+
+    Not the dumb ones. Don't use `%`.
+
+3.  Create an infix `xor()` operator.
+
+    ```r
+    `%xor%` = function(a, b) (a && !b) || (!a && b)
+    ```
+
+4.  Create infix versions of the set functions `intersect()`, `union()`,
+    and `setdiff()`.
+
+    ```r
+    `%intersect%` = function(...) intersect(...)
+    `%union%`     = function(...) union(...)
+    `%setdiff%`   = function(...) setdiff(...)
+    ```
+
+5.  Create a replacement function that modifies a random location in a vector.
+
+    ```r
+    # Note that the function needs to return 'x', otherwise we will just
+    # assign 'value'!
+    `randmod<-` = function(x, value) { x[sample(1:length(x), 1)] = value; x }
+    y = 1:10
+    randmod(y) <- -1
+    y
+     [1]  1  2  3 -1  5  6  7  8  9 10
     ```
 
 
-Special Calls
+Return Values
 -------------
