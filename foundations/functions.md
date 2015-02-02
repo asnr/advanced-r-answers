@@ -1,3 +1,84 @@
+Quiz
+----
+
+1.  What are the three components of a function?
+
+    `body`, `environment`, `formals`
+    
+2.  What does the following code return?
+    ```r
+    x <- 10
+    f1 <- function(x) {
+      function() {
+        x + 10
+      }
+    }
+    f1(1)()
+    ```
+    
+    `11`.
+
+3.  How would you more typically write this code?
+    ```r
+    `+`(1, `*`(2, 3))
+    ```
+    
+    ```r
+    1 + (2*3)
+    ```
+
+4.  How could you make this call easier to read?
+    ```r
+    mean(, TRUE, x = c(1:10, NA))
+    ```
+    
+    ```r
+    mean(c(1:10, NA), na.rm=TRUE)
+    ```
+
+5.  Does the following function throw an error when called? Why/why not?
+    ```r
+    f2 <- function(a, b) {
+      a * 10
+    }
+    f2(10, stop("This is an error!"))
+    ```
+    
+    No, it doesn't throw an error because arguments are evaluated lazily and `b` 
+    is never evaluated in the function body.
+
+6.  What is an infix function? How do you write it? What’s a replacement function? How do you write it?
+
+    An infix function is a binary function that can be written as a binary operator, eg. ``1+2 == `+`(1, 2)``.
+    To define an infix function, wrap the name in `%` and then backticks:
+    ```r
+    `%inf%` = function(a, b) {
+        ...
+    }
+    c = a %inf% b
+    ```
+    
+    A replacement function is syntactic sugar that lets you present an interface as
+    if the function modified its first arguments in place. To declare a replacement function, end its name
+    with `<-`, enclose the name in backticks, give it an argument called `value` and remember that
+    because this syntax doesn't provide a means to actually modify an object in place, you need to return
+    the new object:
+    ```r
+    `first<-` = function(x, value) {
+        x[1] = value
+        x
+    }
+    y = rep(3, 3)
+    first(y) = 1
+    y
+    # [1] 1 3 3
+    ```
+    
+7.  What function do you use to ensure that a cleanup action occurs regardless of how a function terminates?
+
+    `on.exit()`
+
+
 Function Components
 -------------------
 
