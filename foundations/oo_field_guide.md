@@ -100,4 +100,11 @@ S3
     ```
     Just throw error.
 
+3.  R has two classes for representing date time data, POSIXct and POSIXlt, which both inherit from POSIXt.
+    Which generics have different behaviours for the two classes? Which generics share the same behaviour?
 
+    POSIXct is epoch time, ie. seconds since the beginning of 1970. Traditionally stored as a 32-bit signed
+    `int`, but R stores it internally as a `double`. POSIXlt is a tuple of integers representing year, month,
+    day of the month, hour, minute and second.
+    See the [original paper](http://cran.r-project.org/doc/Rnews/Rnews_2001-2.pdf#chapter*.12)
+    describing their implementation of the R internals more information.
