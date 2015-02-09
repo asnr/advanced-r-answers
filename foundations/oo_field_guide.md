@@ -108,3 +108,34 @@ S3
     day of the month, hour, minute and second.
     See the [original paper](http://cran.r-project.org/doc/Rnews/Rnews_2001-2.pdf#chapter*.12)
     describing their implementation of the R internals more information.
+
+4.  Which base generic has the greatest number of defined methods?
+
+    ```r
+    objs <- mget(ls("package:base"), inherits = TRUE)
+
+    is_s3_generic = function(f) all(c("generic", "s3") %in% ftype(f))
+    is_generic = function(f) "generic" %in% ftype(f)
+    is_not_internal  = function(f) !("internal"  %in% ftype(f))
+    is_not_primitive = function(f) !("primitive" %in% ftype(f))
+
+    s3_gens = Filter(is_s3_generic, objs)
+    length(s3_gens)  # 65
+    gens = Filter(is_generic, objs)
+    length(gens)  # 177
+    gens_not_internal = Filter(is_not_internal, gens)
+    length(gens_not_internal)  # 166
+    gens_not_int_nor_prim = Filter(is_not_primitive, gens_not_internal)
+    length(gens_not_int_nor_prim)  # 67
+
+    max_idx_not_int_nor_prim = which.max(lapply(names(gens_not_int_nor_prim),
+                                                num_methods))
+    gens_not_int_nor_prim[max_idx_not_int_nor_prim]
+    #> $print
+    #> ...
+
+    max_idx_s3_gens = which.max(lapply(names(s3_gens), num_methods))
+    s3_gens[max_idx_s3_gens]
+    #> $print
+    #> ...
+    ```
