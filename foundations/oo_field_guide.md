@@ -139,3 +139,78 @@ S3
     #> $print
     #> ...
     ```
+
+5.  UseMethod() calls methods in a special way. Predict what the following
+    code will return, then run it and read the help for UseMethod() to figure
+    out what’s going on. Write down the rules in the simplest form possible.
+    ```r
+    y <- 1
+    g <- function(x) {
+      y <- 2
+      UseMethod("g")
+    }
+    g.numeric <- function(x) y
+    g(10)
+
+    h <- function(x) {
+      x <- 10
+      UseMethod("h")
+    }
+    h.character <- function(x) paste("char", x)
+    h.numeric <- function(x) paste("num", x)
+
+    h("a")
+    ```
+
+    ```r
+    g(10)
+    #> 2
+
+    h("a")
+    #> "char a"
+    ```
+    
+    From the man page, `UseMethod` does the following:
+
+    1.  Find the context for the calling function (the generic): this
+        gives us the unevaluated arguments for the original call.
+
+    2.  Evaluate the object (usually an argument) to be used for
+        dispatch, and find a method (possibly the default method) or
+        throw an error.
+
+    3.  Create an environment for evaluating the method and insert
+        special variables (see below) into that environment.  Also
+        copy any variables in the environment of the generic that are
+        not formal (or actual) arguments.
+
+    4.  Fix up the argument list to be the arguments of the call
+        matched to the formals of the method.
+
+    So when `g(10)` is called, `y` is copied into the environment of the
+    dispatchee. Similarly, when `h("a")` is called, `x` with the value of
+    `10` is copied to the environment of the dispatchee but it is then clobbered by the actual argument passed to the dispatcher.
+
+    Interestingly, if no object is specified to `UseMethod` (second argument,
+    see the man page), then the first argument to the generic function is
+    evaluated to determine the correct dispatchee, ie. this triggers
+    evaluation before you would expect from a lazily-evaluated argument:
+    ```r
+    f = function() {print('hi'); return(1); }
+
+    g = function(x)    UseMethod('g')
+    h = function(x, y) UseMethod('h')
+
+    g.numeric = function(x)    deparse(substitute(x))
+    h.numeric = function(x, y) deparse(substitute(y))
+
+    g(f())
+    #> [1] "hi"
+    #> [1] "f()"
+    h(1, f())
+    #> [1] "f()"
+    ```
+    **COME BACK AND CHECK: CAN I TRIGGER EVALUATION TWICE LIKE THIS, EVEN
+    WHEN THE ARGUMENT IS ONLY REFERENCED ONCE? PROBABLY NOT---ONCE EVALUATED
+    BY THE GENERIC, THE THUNK IS PROBABLY REPLACED BY THE EVALUATED VALUE**
+
