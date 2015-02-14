@@ -62,6 +62,61 @@ Environment basics
 Recursing over environments
 ---------------------------
 
+1.  Create a recursive function to find all environments that contain a
+    binding for name.
+
+    ```r
+    envs_with = function(name, env=parent.frame()) {
+        
+        if (identical(env, emptyenv()))
+            env_name_vec = NULL
+        else if (exists(name, envir=env, inherits=FALSE))
+            env_name_vec = c(env,
+                             envs_with(name, parent.env(env)))
+        else
+            env_name_vec = envs_with(name, parent.env(env))
+
+        return(env_name_vec)
+    }
+    
+    unlist(lapply(envs_with('mean'), environmentName))
+    #> [1] "base"
+
+    mean = 1
+    unlist(lapply(envs_with('mean'), environmentName))
+    #> [1] "R_GlobalEnv" "base"
+    ```
+
+2.  Write your own version of `get()` using a function written in the style of
+    `where()`.
+
+    ```r
+    my_get = function(name, env=parent.frame(), inherits=TRUE) {
+
+        if (identical(env, emptyenv()))
+            stop("Can't find ", name, call. = FALSE)
+        else if (exists(name, envir=env, inherits=FALSE))
+            env[[name]]
+        else if (inherits)
+            my_get(name, env=parent.env(env))
+        else
+            stop("Can't find ", name, call. = FALSE)
+    }
+
+    my_get('x')
+    #> Error: Can't find x
+
+    x = 1
+    my_get('x')
+    #> [1] 1
+
+    my_get('mean')
+    #> function (x, ...)
+    #> UseMethod("mean")
+    #> <bytecode: 0x7fcf148750e8>
+    #> <environment: namespace:base>
+    ```
+
 
 Function environments
 ---------------------
