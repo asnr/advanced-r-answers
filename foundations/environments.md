@@ -120,3 +120,31 @@ Recursing over environments
 
 Function environments
 ---------------------
+
+
+
+Binding names to values
+-----------------------
+
+1.  What does this function do? How does it differ from <<- and why might you
+    prefer it?
+    ```r
+    rebind <- function(name, value, env = parent.frame()) {
+      if (identical(env, emptyenv())) {
+        stop("Can't find ", name, call. = FALSE)
+      } else if (exists(name, envir = env, inherits = FALSE)) {
+        assign(name, value, envir = env)
+      } else {
+        rebind(name, value, parent.env(env))
+      }
+    }
+    rebind("a", 10)
+    #> Error: Can't find a
+    a <- 5
+    rebind("a", 10)
+    a
+    #> [1] 10
+    ```
+
+Explicit environments
+---------------------
