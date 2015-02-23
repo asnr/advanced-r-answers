@@ -121,7 +121,11 @@ Recursing over environments
 Function environments
 ---------------------
 
+1.  List the four environments associated with a function. What does each one
+    do? Why is the distinction between enclosing and binding environments
+    particularly important?
 
+    
 
 Binding names to values
 -----------------------
@@ -146,5 +150,5 @@ Binding names to values
     #> [1] 10
     ```
 
-Explicit environments
----------------------
+    `rebind` will emit an error if it cannot find `name` in the search path, while `<<-` will create a name in the global environment and bind the supplied value to it. This is 
+
