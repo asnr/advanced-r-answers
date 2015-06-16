@@ -12,14 +12,9 @@ Getting started
         y += x[i] / n;
       }
       return y;
-    }   
-    ```
+    }
+    // f1 = mean
 
-    ```r
-    f1 = mean
-    ```
-
-    ```cpp
     NumericVector f2(NumericVector x) {
       int n = x.size();
       NumericVector out(n);
@@ -30,13 +25,9 @@ Getting started
       }
       return out;
     }
-    ```
+    // f2 = cumsum
+    
 
-    ```r
-    f2 = cumsum
-    ```
-
-    ```cpp
     bool f3(LogicalVector x) {
       int n = x.size();
 
@@ -45,13 +36,9 @@ Getting started
       }
       return false;
     }
-    ```
+    // f3 = any
 
-    ```r
-    f3 = any
-    ```
-
-    ```cpp
+    
     int f4(Function pred, List x) {
       int n = x.size();
 
@@ -61,13 +48,9 @@ Getting started
       }
       return 0;
     }
-    ```
+    // f4 = which.max
+    
 
-    ```r
-    f4 = which.max
-    ```
-
-    ```cpp
     NumericVector f5(NumericVector x, NumericVector y) {
       int n = std::max(x.size(), y.size());
       NumericVector x1 = rep_len(x, n);
@@ -81,10 +64,7 @@ Getting started
 
       return out;
     }
-    ```
-
-    ```r
-    f5 = pmin
+    // f5 = pmin
     ```
 
  2. Rewrite R functions with RCpp.
