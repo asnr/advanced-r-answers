@@ -107,4 +107,32 @@ Getting started
             out[i] = std::max(x[i], out[i-1]);
         }
         return out;
-    }    
+    }
+
+    NumericVector my_diff(NumericVector x, int lag=1, int differences=1) {
+        if (differences == 0)
+            return x;
+
+        int n = x.size();
+        NumericVector out(n - lag);
+        for (int i = lag; i < n; i++) {
+            out[i-lag] = x[i] - x[i-lag];
+        }
+        return my_diff(out, lag, differences - 1);
+    }
+
+    // online variance
+    double my_var(NumericVector x) {
+        double n = 0;
+        double mean = 0;
+        double M2 = 0;
+
+        int len = x.size();
+        for (int i = 0; i < len; i++) {
+            n++;
+            delta = x[i] - mean;
+            mean += delta/n;
+            M2 += delta*(x[i] - mean);
+        }
+        return M2 / (n - 1);
+    }
