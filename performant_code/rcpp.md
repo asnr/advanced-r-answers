@@ -136,3 +136,30 @@ Getting started
         }
         return M2 / (n - 1);
     }
+    ```
+
+Missing Values
+--------------
+
+ 1. Rewrite some R functions, this time dealing with missing values.
+
+    ```cpp
+    double my_max(NumericVector x, bool na_rm=true) {
+        int n = x.size();
+        bool max_set = false;
+        double max;
+        for (int i = 0; i < n; i++) {
+            if (x[i] == NA_REAL) {
+                if (!na_rm)
+                    return NA_REAL;
+                // if (na_rm), then do nothing this iteration    
+            } else {
+                if (max_set)
+                    max = std::max(max, x[i]);
+                else
+                    max = x[i];
+            }
+        }
+        return max;
+    }
+    ```
