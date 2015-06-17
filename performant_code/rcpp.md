@@ -149,7 +149,7 @@ Missing Values
         bool max_set = false;
         double max;
         for (int i = 0; i < n; i++) {
-            if (x[i] == NA_REAL) {
+            if (NumericVector::is_na(x[i])) {
                 if (!na_rm)
                     return NA_REAL;
                 // if (na_rm), then do nothing this iteration    
@@ -163,4 +163,35 @@ Missing Values
         return max;
     }
     ```
-    
+
+
+STL
+---
+
+ 1. Rewrite `median.default()` using `partial_sort`.
+
+    ```cpp
+    #include <algorithm>
+    #include <Rcpp.h>
+
+    using namespace Rcpp;
+
+    // [[Rcpp::export]]
+    double my_median_default(NumericVector x, bool na_rm=false) {
+        
+        NumericVector x_no_na = x[!is_na(x)];
+        if (!na_rm && x_no_na.size() < x.size())
+            return NA_REAL;
+        
+        int half_dist = x_no_na.size()/2;
+        NumericVector::iterator middle = x_no_na.begin() + half_dist + 1;
+        std::partial_sort(x_no_na.begin(), middle,
+                          x_no_na.end());
+        
+        middle = x_no_na.begin() + half_dist;
+        if (x_no_na.size() % 2 == 0) 
+            return ( (*middle) + (*(middle-1)) )/2;
+        else
+            return *middle;
+    }
+    ```
