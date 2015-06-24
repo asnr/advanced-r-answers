@@ -195,3 +195,43 @@ STL
             return *middle;
     }
     ```
+
+ 2. Rewrite `%in%` using `unordered_set`
+    ```
+    // [[Rcpp::plugins(cpp11)]]
+    #include <Rcpp.h>
+    #include <unordered_set>
+    using namespace Rcpp;
+     
+    // Note we cannot implement this trivially for NumericVector because String
+    // does not have a hash implementation:
+    // undefined reference to `std::hash<Rcpp::String>::operator()(Rcpp::String) const
+    // [[Rcpp::export]]
+    LogicalVector my_in(NumericVector x, NumericVector table) {
+        
+        std::unordered_set<double> table_set;
+        NumericVector::iterator it;
+        for (it = table.begin(); it != table.end(); it++) {
+            table_set.insert(*it);
+        }
+        
+        LogicalVector out(x.size());
+        LogicalVector::iterator l_it;
+        for (l_it = out.begin(), it = x.begin(); l_it != out.end(); l_it++, it++) {
+            if (table_set.count(*it) > 0)
+                *l_it = true;
+            else
+                *l_it = false;
+        }
+        
+        return out;
+    }
+    ```
+    
+ 3. Rewrite `unique` using `unordered_set`
+    ```cpp
+    // [[Rcpp::export]]
+    NumericVector my_unique(NumericVector x) {
+        return wrap(std::unordered_set<double>(x.begin(), x.end()));
+    }
+    ```
