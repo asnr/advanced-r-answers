@@ -228,10 +228,32 @@ STL
     }
     ```
     
- 3. Rewrite `unique` using `unordered_set`
+ 3. Rewrite `unique()` using `unordered_set`
     ```cpp
+    // [[Rcpp::plugins(cpp11)]]
+    #include <Rcpp.h>
+    #include <unordered_set>
+    using namespace Rcpp;
+
     // [[Rcpp::export]]
     NumericVector my_unique(NumericVector x) {
         return wrap(std::unordered_set<double>(x.begin(), x.end()));
+    }
+    ```
+
+ 4. Rewrite `max()` using `std::max()`
+    ```cpp
+    // [[Rcpp::plugins(cpp11)]]
+    #include <Rcpp.h>
+    using namespace Rcpp;
+
+    // [[Rcpp::export]]
+    double my_max(NumericVector x, na_rm = false) {
+        
+        NumericVector x_no_na = x[!is_na(x)];
+        if (!na_rm && x_no_na.size() < x.size())
+            return NA_REAL;
+        
+        return *(std::max_element(x_no_na.begin(), x_no_na.end()));
     }
     ```
