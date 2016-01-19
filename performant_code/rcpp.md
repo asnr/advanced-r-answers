@@ -149,7 +149,7 @@ Missing Values
         bool max_set = false;
         double max;
         for (int i = 0; i < n; i++) {
-            if (x[i] == NA_REAL) {
+            if (NumericVector::is_na(x[i])) {
                 if (!na_rm)
                     return NA_REAL;
                 // if (na_rm), then do nothing this iteration    
@@ -165,4 +165,94 @@ Missing Values
     ```
 
 
+STL
+---
+
+ 1. Rewrite `median.default()` using `partial_sort`.
+
+    ```cpp
+    #include <algorithm>
+    #include <Rcpp.h>
+
+    using namespace Rcpp;
+
+    // [[Rcpp::export]]
+    double my_median_default(NumericVector x, bool na_rm=false) {
+        
+        NumericVector x_no_na = x[!is_na(x)];
+        if (!na_rm && x_no_na.size() < x.size())
+            return NA_REAL;
+        
+        int half_dist = x_no_na.size()/2;
+        NumericVector::iterator middle = x_no_na.begin() + half_dist + 1;
+        std::partial_sort(x_no_na.begin(), middle,
+                          x_no_na.end());
+        
+        middle = x_no_na.begin() + half_dist;
+        if (x_no_na.size() % 2 == 0) 
+            return ( (*middle) + (*(middle-1)) )/2;
+        else
+            return *middle;
+    }
+    ```
+
+ 2. Rewrite `%in%` using `unordered_set`
+    ```
+    // [[Rcpp::plugins(cpp11)]]
+    #include <Rcpp.h>
+    #include <unordered_set>
+    using namespace Rcpp;
+     
+    // Note we cannot implement this trivially for NumericVector because String
+    // does not have a hash implementation:
+    // undefined reference to `std::hash<Rcpp::String>::operator()(Rcpp::String) const
+    // [[Rcpp::export]]
+    LogicalVector my_in(NumericVector x, NumericVector table) {
+        
+        std::unordered_set<double> table_set;
+        NumericVector::iterator it;
+        for (it = table.begin(); it != table.end(); it++) {
+            table_set.insert(*it);
+        }
+        
+        LogicalVector out(x.size());
+        LogicalVector::iterator l_it;
+        for (l_it = out.begin(), it = x.begin(); l_it != out.end(); l_it++, it++) {
+            if (table_set.count(*it) > 0)
+                *l_it = true;
+            else
+                *l_it = false;
+        }
+        
+        return out;
+    }
+    ```
     
+ 3. Rewrite `unique()` using `unordered_set`
+    ```cpp
+    // [[Rcpp::plugins(cpp11)]]
+    #include <Rcpp.h>
+    #include <unordered_set>
+    using namespace Rcpp;
+
+    // [[Rcpp::export]]
+    NumericVector my_unique(NumericVector x) {
+        return wrap(std::unordered_set<double>(x.begin(), x.end()));
+    }
+    ```
+
+ 4. Rewrite `max()` using `std::max()`
+    ```cpp
+    // [[Rcpp::plugins(cpp11)]]
+    #include <Rcpp.h>
+    using namespace Rcpp;
+
+    // [[Rcpp::export]]
+    double my_max(NumericVector x, na_rm = false) {
+        
+        NumericVector x_no_na = x[!is_na(x)];
+        if (!na_rm && x_no_na.size() < x.size())
+            return NA_REAL;
+        
+        return *(std::max_element(x_no_na.begin(), x_no_na.end()));
+    }
