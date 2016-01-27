@@ -100,8 +100,8 @@ Non-standard evaluation in subset
         r <- eval(condition_call, x)
         x[r, , drop = FALSE]
     }
-    sample_df2 <- data.frame(x = 1:10)
-    subset3(sample_df2, x > 8)
+    sample_df3 <- data.frame(x = 1:10)
+    subset3(sample_df3, x > 8)
     #>     x
     #> 9   9
     #> 10 10
@@ -116,8 +116,8 @@ Non-standard evaluation in subset
         r <- eval(condition_call, x)
         x[r & !is.na(r), , drop = FALSE]
     }
-    sample_df3 <- data.frame(x = c(1:10, NA))
-    subset4(sample_df3, x > 8)
+    sample_df4 <- data.frame(x = c(1:10, NA))
+    subset4(sample_df4, x > 8)
     #>     x
     #> 9   9
     #> 10 10
@@ -126,7 +126,7 @@ Non-standard evaluation in subset
  4. What happens if you use `quote()` instead of `substitute()` inside of
     `subset2()`?
 
-    
+    We get an error:
 
     ```r
     subset5 <- function(y, condition) {
@@ -134,9 +134,41 @@ Non-standard evaluation in subset
         r <- eval(condition_call, y)
         y[r, ]
     }
-    sample_df3 <- data.frame(x = c(1:10, NA))
-    subset5(sample_df3, x > 8)
-    #>  integer(0)
+    sample_df5 <- data.frame(x = c(1:10, NA))
+    subset5(sample_df5, x > 8)
+    #>  Error in eval(expr, envir, enclos) : object 'x' not found
     ```
 
-    WTF why `integer(0)`
+    To understand why this occurs, try setting the `enclos` argument of `eval` to be `NULL`:
+
+    ```r
+    subset5_2 <- function(y, condition) {
+        condition_call <- quote(condition)
+        r <- eval(condition_call, y, enclos = NULL)
+        y[r, ]
+    }
+    subset5_2(sample_df5, x > 8)
+    #>  Error in eval(expr, envir, enclos) : object 'condition' not found
+    ```
+
+    In the call to `subset5`, `quote` is capturing the symbol `condition` (as opposed to `substitute`, which captures the expression slot of the `condition` promise object). The call to `eval`
+
+         1. tries to find `condition` int the `sample_df5` environment and fails;
+         2. so it looks in the environment where `eval` is called (see `?eval`: the default argument to `enclos` is `parent.frame`, ie. the parent of the `eval` frame); it finds the promise object tied to the formal argument `condition`, which it tries to evaluate;
+         3. it evaluates `x > 8` in the global environment which fails as `x` has not been defined.
+    
+    By setting `enclos = NULL`, this process stops at step 1 and an error is thrown immediately.
+
+ 5. The second argument in `subset()` allows you to select variables. It treats variable names as if they were positions. This allows you to do things like `subset(mtcars, , -cyl)` to drop the cylinder variable, or `subset(mtcars, , disp:drat)` to select all the variables between `disp` and `drat`. How does this work? I've made this easier to understand by extracting it out into its own function.
+
+    ```r
+    select <- function(df, vars) {
+        vars <- substitute(vars)
+        var_pos <- setNames(as.list(seq_along(df)), names(df))
+        pos <- eval(vars, var_pos)
+        df[, pos, drop = FALSE]
+    }
+    select(mtcars, -cyl)
+    ```
+
+    
